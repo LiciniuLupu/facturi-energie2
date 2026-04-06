@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ș<!DOCTYPE html>
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
@@ -276,13 +276,18 @@ async function exportExcel(){
     const resp=await fetch('/export',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(lastData)});
     if(!resp.ok)throw new Error('Eroare la generare Excel');
     const blob=await resp.blob();
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');a.href=url;a.download='Consum_Energie_'+lastData.year+'.xlsx';
-    document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+    const reader=new FileReader();
+    reader.onloadend=function(){
+      const a=document.createElement('a');
+      a.href=reader.result;
+      a.download='Consum_Energie_'+lastData.year+'.xlsx';
+      document.body.appendChild(a);a.click();document.body.removeChild(a);
+    };
+    reader.readAsDataURL(blob);
   }catch(e){showErr('Eroare export: '+e.message)}
   btn.disabled=false;btn.textContent='Descarca Excel';
 }
-
+  
 function resetApp(){document.getElementById('results').style.display='none';document.getElementById('alert-box').innerHTML='';files=[];renderChips();lastData=null}
 function showErr(msg){document.getElementById('err-box').innerHTML=msg?'<div class="alert alert-red">'+msg+'</div>':''}
 function setProg(t){document.getElementById('prog-txt').textContent=t}
